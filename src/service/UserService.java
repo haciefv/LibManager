@@ -1,4 +1,4 @@
 package service;
 
-public class USerService {
+public class UserService {
 }

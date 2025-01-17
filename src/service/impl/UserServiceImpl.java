@@ -1,4 +1,4 @@
 package service.impl;
 
-public class UserServiceImpl {
+public interface UserServiceImpl {
 }

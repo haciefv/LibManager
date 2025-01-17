@@ -1,4 +1,4 @@
 package service.impl;
 
-public class BookServiceImpl {
+public interface BookServiceImpl {
 }
