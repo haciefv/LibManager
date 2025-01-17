@@ -1,4 +1,4 @@
 package service.impl;
 
-public interface BorrowServiceImpl {
+public class BorrowServiceImpl {
 }
