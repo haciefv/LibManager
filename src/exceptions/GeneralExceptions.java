@@ -8,4 +8,5 @@ public class GeneralExceptions extends RuntimeException{
         super(exceptions.toString());
     }
 
+
 }
