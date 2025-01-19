@@ -1,4 +1,6 @@
 package service.impl;
 
-public class BookServiceImpl {
+import service.BookService;
+
+public class BookServiceImpl implements BookService {
 }

@@ -1,102 +1,204 @@
 package service.impl;
 
+import enums.Exceptions;
+import enums.Role;
+import exceptions.GeneralExceptions;
+import helper.UserServiceHelper;
 import model.User;
 import service.UserService;
+import util.InputUtil;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class UserServiceImpl implements UserService {
 
-    private User[] users = new User[0];
+    private static final InputUtil inputUtil = InputUtil.getInstance();
+    private User[] users = new User[10];
     private int userCount = 0;
+    private static User currentUser;
+    private static long userIdCounter = 1;
 
 
+    public UserServiceImpl() {
+        User admin = new User();
+        admin.setName("Admin");
+        admin.setSurname("Admin");
+        admin.setUsername("Admin");
+        admin.setPassword("Admin");
+        admin.setRole(Role.ADMIN);
+        admin.setId(userIdCounter++);
+        admin.setActive(true);
+        admin.setBlocked(false);
+        admin.setRegisteredDate(LocalDateTime.now());
+        admin.setLastLoginDate(LocalDateTime.now());
+
+        users[userCount++] = admin;
+    }
+
+    @Override
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
 
     private void expandUserArrayIfNeeded() {
         if (userCount == users.length) {
             User[] newUsers = new User[users.length + 5];
             System.arraycopy(users, 0, newUsers, 0, users.length);
             users = newUsers;
-
         }
-
     }
 
     @Override
-    public void registerUser(User user) {
-        if (findUserById(user.getId()) != null) {
-            System.out.println("User already registered");
+    public void login(String username, String password) {
+        User user = findUserByUsername(username);
 
-            return;
+        if (user == null) {
+            throw new GeneralExceptions(Exceptions.USER_NOT_REGISTERED);
         }
+
+        if (user.getPassword().equals(password)) {
+            setCurrentUser(user);
+            System.out.println("Login successful for: " + user.getName());
+        } else {
+            throw new GeneralExceptions(Exceptions.INVALID_CREDENTIALS);
+        }
+    }
+
+    private User findUserByUsername(String username) {
+        for (User user : users) {
+            if (user != null && user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void registerAsUser() {
+        String username = InputUtil.getInstance().inputTypeString("Enter your username: ");
+
+        if (findUserByUsername(username) != null) {
+            throw new GeneralExceptions(Exceptions.USER_ALREADY_REGISTERED);
+        }
+
+        String name = InputUtil.getInstance().inputTypeString("Enter your name: ");
+        String surname = InputUtil.getInstance().inputTypeString("Enter your surname: ");
+        String password = InputUtil.getInstance().inputTypeString("Enter your password: ");
+        LocalDate birthDate = InputUtil.getInstance().inputTypeLocalDate("Enter your birthDate(yyyy-MM-dd): ");
+        String gmail = InputUtil.getInstance().inputTypeString("Enter your gmail: ");
+        String phoneNumber = InputUtil.getInstance().inputTypeString("Enter your phone number: ");
+
+        User newUser = new User();
+
+        newUser.setId(userIdCounter++);
+        newUser.setName(name);
+        newUser.setSurname(surname);
+        newUser.setUsername(username);
+        newUser.setPassword(password);
+        newUser.setBirthDate(birthDate);
+        newUser.setGmail(gmail);
+        newUser.setPhoneNumber(phoneNumber);
+        newUser.setActive(true);
+        newUser.setBlocked(false);
+        newUser.setRegisteredDate(LocalDateTime.now());
+        newUser.setLastLoginDate(LocalDateTime.now());
+        newUser.setRole(Role.USER);
+
         expandUserArrayIfNeeded();
-        users[userCount++] = user;
 
-        System.out.println("User registered successfully");
-
-
+        users[userCount++] = newUser;
+        System.out.println("\nUser registered successfully");
     }
 
     @Override
     public void updateUser(Long id, User updateUser) {
-        for (int i = 0; i < userCount; i++) {
-            if (users[i].getId() == id) {
-                users[i] = updateUser;
+        User existingUser = UserServiceHelper.findUserById(users, userCount, id);
 
-                System.out.println("User updated successfully");
-
-                return;
-            }
+        if (existingUser == null) {
+            throw new GeneralExceptions(Exceptions.USER_NOT_FOUND);
         }
 
-        System.out.println("User not found");
-
+        UserServiceHelper.updateUserData(existingUser, updateUser);
+        System.out.println("\nProfile has been updated successfully.");
     }
 
     @Override
-    public void deleteUser(Long id) {
-        for (int i = 0; i < userCount; i++) {
-            if (users[i].getId() == id) {
+    public void deleteProfile() {
+        UserServiceHelper.checkIfUser(currentUser);
+        UserServiceHelper.deleteUser(users, userCount, currentUser.getId());
+        System.out.println("Your profile has been deleted successfully.");
+    }
 
-                for (int j = i; j < userCount - 1; j++) {
-                    users[j] = users[j + 1];
-                }
-                users[--userCount] = null;
-
-                System.out.println("User deleted successfully");
-
-                return;
-            }
-
-        }
-
-        System.out.println("User not found");
-
+    @Override
+    public void deleteByAdmin(Long id) {
+        UserServiceHelper.checkIfAdmin(currentUser);
+        UserServiceHelper.deleteUser(users, userCount, id);
+        System.out.println("User with ID " + id + " has been deleted successfully.");
     }
 
     @Override
     public void showUsers() {
-        if (userCount==0){
-            System.out.println("Not found any user");
 
-            return;
-        }
-        for (int i = 0; i < userCount; i++){
-            User user=users[i];
-            System.out.println("name: "+user.getName()+"surname: "+user.getSurName());
+        UserServiceHelper.checkIfAdmin(currentUser);
+
+        if (userCount == 0) {
+            throw new GeneralExceptions(Exceptions.USER_NOT_FOUND);
         }
 
+        for (int i = 0; i < userCount; i++) {
+            User user = users[i];
+            System.out.println(
+                    "--------------------------------------" +
+                            "\nId: " + user.getId() +
+                            "\nName: " + user.getName() +
+                            "\nSurname: " + user.getSurname() +
+                            "\nUsername: " + user.getUsername() +
+                            "\nPassword: " + user.getPassword() +
+                            "\nBirthDate: " + user.getBirthDate() +
+                            "\nGmail: " + user.getGmail() +
+                            "\nPhone Number: " + user.getPhoneNumber() +
+                            "\nActive: " + user.getIsActive() +
+                            "\nBlocked: " + user.getIsBlocked() +
+                            "\nRegistered Date: " + user.getRegisteredDate() +
+                            "\nLast Login Date: " + user.getLastLoginDate() +
+                            "\nRole: " + user.getRole() +
+                            "\n--------------------------------------"
+            );
+        }
     }
 
     @Override
-    public User findUserById(Long id) {
-        for (int i = 0; i < userCount; i++) {
-            if (users[i].getId() == id) {
+    public void showUserProfile() {
+        UserServiceHelper.checkIfUser(currentUser);
+        System.out.println(currentUser);
+    }
 
-                return users[i];
+    @Override
+    public void logout() {
+        currentUser = null;
+        System.out.println("You have been logged out.");
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+
+        for (User user : users) {
+            if (Objects.equals(user.getId(), userId)) {
+                return user;
             }
-
-
         }
         return null;
+
     }
+
+//    TODO Burada her hansisa islemnen evvle Userin login olmaqini yoxlamaq lazimdi
+//     eger login olmayibsa ve ya register olmayibsa bir xeta atmaq lazimdi
+//     login ve ya register ol bu islemi istifade eleye bilmek ucun kimisinden
+
 }

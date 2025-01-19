@@ -4,13 +4,16 @@ import model.User;
 
 public interface UserService {
 
-
-     void registerUser(User user);
+     void login(String username, String password);
+     void registerAsUser();
      void updateUser(Long id, User updateUser);
-     void  deleteUser(Long id);
+     void deleteProfile();
+     void deleteByAdmin(Long id);
      void showUsers();
-     User findUserById(Long id);
+     void showUserProfile();
+     void logout();
 
+     User getCurrentUser();
 
-
+     User getUserById(Long userId);
 }

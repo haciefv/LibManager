@@ -1,4 +1,6 @@
 package service.impl;
 
-public class BorrowServiceImpl {
+import service.BorrowService;
+
+public class BorrowServiceImpl implements BorrowService {
 }
