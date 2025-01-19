@@ -8,7 +8,9 @@ public enum Exceptions {
     USER_NOT_FOUND("\n---------------| User is not found! |---------------"),
     BOOK_NOT_FOUND("\n---------------| Book is not found! |---------------"),
     INVALID_OPTION("\n---------------| Invalid option!!! |---------------"),
-    INVALID_DATA_FORMAT("\n---------------| Invalid date format. Please use dd-MM-yyyy |---------------");
+    INVALID_DATA_FORMAT("\n---------------| Invalid date format. Please use dd-MM-yyyy |---------------"),
+    INVALID_AGE("\n---------------| Age can not be smaller than 0! |---------------");
+
 
     private final String message;
     private final LocalDateTime timeStamp = LocalDateTime.now().withNano(0);
