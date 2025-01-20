@@ -7,9 +7,14 @@ public enum Exceptions {
 
     USER_NOT_FOUND("\n---------------| User is not found! |---------------"),
     BOOK_NOT_FOUND("\n---------------| Book is not found! |---------------"),
+    ID_CANNOT_BE_ZERO("\n---------------| Id cannot be small than 0 or null! |---------------"),
     INVALID_OPTION("\n---------------| Invalid option!!! |---------------"),
+    ACCESS_DENIED("\n---------------| You don't have access for this process! |---------------"),
+    UNAUTHORIZED_ACCESS("\n---------------| Only admins are authorized to perform this action! |---------------"),
     INVALID_DATA_FORMAT("\n---------------| Invalid date format. Please use dd-MM-yyyy |---------------"),
-    INVALID_AGE("\n---------------| Age can not be smaller than 0! |---------------");
+    USER_ALREADY_REGISTERED("\n---------------| UserName already used! |---------------"),
+    USER_NOT_REGISTERED("\n---------------| User not registered! |---------------"),
+    INVALID_CREDENTIALS("\n---------------| Wrong password! |---------------");
 
 
     private final String message;
@@ -27,8 +32,7 @@ public enum Exceptions {
 
     @Override
     public String toString() {
-        return  message + "\n" +
-                "\nTimeStamp = " + timeStamp + "\n"
+        return  message + "\n"
                 ;
     }
 
