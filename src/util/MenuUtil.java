@@ -3,19 +3,15 @@ package util;
 public class MenuUtil {
 
     public static Byte entryApp() {
-        System.out.println(
-                """
-                        
-                        ----------| Library Management Service |----------
-                        
-                        [0] -> Exit
-                        [1] -> Login as Admin
-                        [2] -> Login or Register as User
-                        [3] -> Book Management
-                        [4] -> Borrow Management
-                        [5] -> Common Functions
-                        """
-        );
+        System.out.println("""
+                                        
+                ----------| Library Management Service |----------
+                                        
+                [1] -> Login as Admin
+                [2] -> Login or Register as User
+                [3] -> Books List
+                [0] -> Exit
+                """);
         return InputUtil.getInstance().inputTypeByte("Choose the module: ");
     }
 
@@ -23,14 +19,13 @@ public class MenuUtil {
         System.out.println(
 
                 """
-                        
+                                                
                         ----------| Login or Register as User Menu |----------
-                        
-                        [0] -> Back to Main Menu
+                                                
                         [1] -> Register as User
                         [2] -> Login
-                        """
-        );
+                        [0] -> Back to Main Menu
+                        """);
 
         return InputUtil.getInstance().inputTypeByte("Choose the option: ");
     }
@@ -40,13 +35,12 @@ public class MenuUtil {
         System.out.println(
 
                 """
-                        
+                                                
                         ----------| Admin Login Menu |----------
-                        
-                        [0] -> Back to Main Menu
+                                                
                         [1] -> Login Admin
-                        """
-        );
+                        [0] -> Back to Main Menu
+                        """);
 
         return InputUtil.getInstance().inputTypeByte("Choose option: ");
     }
@@ -57,72 +51,70 @@ public class MenuUtil {
         System.out.println(
 
                 """
-                        
+                                                
                         ----------| Admin Menu |----------
-                        
-                        [0] -> Back to Main Menu
+                                                
                         [1] -> Update User
                         [2] -> Delete User
                         [3] -> Show All User
                         [4] -> Show Profile
-                        """
-        );
+                        [5] -> Book Management
+                        [6] -> Logout
+                        [0] -> Back to Main Menu
+                        """);
 
         return InputUtil.getInstance().inputTypeByte("Choose option: ");
     }
 
     public static Byte userMenu() {
-        System.out.println(
-                """
-                        
-                        ----------| User Menu |----------
-                        
-                        [0] -> Back to Main Menu
-                        [1] -> Update User
-                        [2] -> Delete User
-                        [3] -> Show Profile
-                        """
-        );
+        System.out.println("""
+                                        
+                ----------| User Menu |----------
+                                        
+                [1] -> Update User
+                [2] -> Delete User
+                [3] -> Show Profile
+                [4] -> Borrow Book
+                [5] -> Return Book
+                [0] -> Back to Main Menu
+                """);
         return InputUtil.getInstance().inputTypeByte("Choose the option: ");
     }
 
 
     public static Byte bookMenu() {
-        System.out.println(
-                """
-                        
-                        ----------| Book Management |----------
-                        
-                        [0] -> Back to Main Menu
-                        [1] -> (add book methods)
-                        """
-        );
+        System.out.println("""
+                                        
+                ----------| Book Management |----------
+                                        
+                [1] -> Add Book
+                [2] -> Update Book
+                [3] -> Delete Book
+                [4] -> Show All Books
+                [0] -> Back to Main Menu
+                """);
         return InputUtil.getInstance().inputTypeByte("Choose the option: ");
     }
 
     public static Byte borrowMenu() {
-        System.out.println(
-                """
-                        
-                        ----------| Borrow Management |----------
-                        
-                        [0] -> Back to Main Menu
-                        [1] -> (add borrow methods)
-                        """
-        );
+        System.out.println("""
+                                        
+                ----------| Borrow Management |----------
+                                        
+                [1] -> (add borrow methods)
+                [0] -> Back to Main Menu
+                """);
         return InputUtil.getInstance().inputTypeByte("Choose the option: ");
     }
 
     public static Byte commonMenu() {
-        System.out.println(
-                """
-                        
-                        ----------| Common Functions |----------
-                        
-                        [0] -> Back to Main Menu
-                        [1] -> (add common methods)
-                        """
-        );
+        System.out.println("""
+                                        
+                ----------| Common Functions |----------
+                                        
+                [1] -> (add common methods)
+                [0] -> Back to Main Menu
+                """);
         return InputUtil.getInstance().inputTypeByte("Choose the option: ");
     }
 }

@@ -7,6 +7,7 @@ import model.User;
 import service.BookService;
 import service.BorrowService;
 import service.UserService;
+import service.impl.BookServiceImpl;
 import util.InputUtil;
 import util.MenuUtil;
 
@@ -156,7 +157,8 @@ public class ManagementHelper {
 
                 case 3 -> userService.showUsers();
                 case 4 -> userService.showUserProfile();
-                case 5 -> userService.logout();
+                case 5 ->  manageBooks(new BookServiceImpl());
+                case 6 -> userService.logout();
                 default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
             }
         }
@@ -245,8 +247,10 @@ public class ManagementHelper {
                 case 0 -> {
                     return;
                 }
-                case 1 -> System.out.println("book Service daxilinde her hansisa method");
-                case 2 -> System.out.println("book Service daxilinde her hansisa 2ci method");
+                case 1 -> bookService.addBook();
+                case 2 -> bookService.updateBook();
+                case 3 -> bookService.deleteBook();
+                case 4 ->bookService.showAllBooks();
                 default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
             }
         }
