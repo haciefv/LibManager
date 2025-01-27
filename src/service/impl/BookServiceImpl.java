@@ -1,6 +1,8 @@
 package service.impl;
 
+import enums.Exceptions;
 import enums.Genres;
+import exceptions.GeneralExceptions;
 import helper.BookServiceHelper;
 import helper.UserServiceHelper;
 import model.Book;
@@ -37,28 +39,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void addBook() {
-        String bookName = InputUtil.getInstance().inputTypeString("Enter book name: ");
-        String bookAuthor = InputUtil.getInstance().inputTypeString("Enter book author: ");
-        int pageCount = InputUtil.getInstance().inputTypeInteger("Enter the number of pages in the book:");
-        for (Genres.BookGenre genre : Genres.BookGenre.values()) {
-            System.out.println(genre);
-        }
-        int genreId = InputUtil.getInstance().inputTypeInteger("Enter the genre of the book:");
-        BookGenre genre = BookGenre.getById(genreId);
-
-        boolean isAvaiable  = InputUtil.getInstance().inputTypeString("""
-                Available now :
-                [1] -> Yes
-                [2] -> No
-                Enter: """).equals("1");
         Book newBook = new Book();
+        BookServiceHelper.settingTheWholeBook(newBook);
         newBook.setId(bookIdCounter++);
-        newBook.setTitle(bookName);
-        newBook.setAuthor(bookAuthor);
-        newBook.setGenre(genre);
-        newBook.setPageCount(pageCount);
-        newBook.setAddedDate(LocalDateTime.now());
-        newBook.setAvailable(isAvaiable);
         books[booksCount++]=newBook;
 
 
@@ -66,12 +49,40 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void updateBook() {
-        UserServiceHelper.checkIfAdmin(currentUser);
+        //UserServiceHelper.checkIfAdmin(currentUser);
+        //***    Problems regarding getting currentUser     ***
+        if (booksCount == 0) {
+            BookServiceHelper.noBookAssignedYet(inputUtil,this);
+            return;
+        }
         int bookId = inputUtil.inputTypeInteger("Enter the book ID to update: ");
-        Book book =BookServiceHelper.findBookById(books,bookId,booksCount);
+        if(bookId <=0) throw new GeneralExceptions(Exceptions.ID_CANNOT_BE_ZERO);
+        Book book = BookServiceHelper.findBookById(books, bookId, booksCount);
+        if(book == null) throw new GeneralExceptions(Exceptions.BOOK_NOT_FOUND);
+        byte choice = inputUtil.inputTypeByte("""
+                What aspect do you want to change?
+                [1] -> Book Title
+                [2] -> Book Author
+                [3] -> Book Page
+                [4] - > Genre
+                [5] -> Availability
+                [6] -> The Whole Book
+                Enter:\s""");
+        switch (choice) {
+            case 1 -> book.setTitle(inputUtil.inputTypeString("Enter the new book name: "));
+            case 2 -> book.setAuthor(inputUtil.inputTypeString("Enter the new author: "));
+            case 3 -> book.setPageCount(inputUtil.inputTypeInteger("Enter the new page count: "));
+            case 4 -> book.setGenre(BookGenre.getById(inputUtil.inputTypeInteger("Enter the new genre: ")));
+            case 5 -> book.setAvailable(InputUtil.getInstance().inputTypeString("""
+                    Available now :
+                    [1] -> Yes
+                    [2] -> No
+                    Enter:\s""").equals("1"));
+            case 6 -> BookServiceHelper.settingTheWholeBook(book);
+            default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
 
-
-        ;
+        }
+        System.out.println("\n---------------| The book has successfully been updated! |---------------");
 
     }
 
@@ -79,6 +90,38 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void deleteBook() {
+        //UserServiceHelper.checkIfAdmin(currentUser);
+        //***    Problems regarding getting currentUser     ***
+        if (booksCount == 0) {
+            BookServiceHelper.noBookAssignedYet(inputUtil,this);
+            return;
+        }
+        String choice = inputUtil.inputTypeString("""
+                How would you like to find the book?
+                [1] -> by ID
+                [2] -> by name
+                Enter:\s""");
+        Object bookInformation = choice.equals("1") ? inputUtil.inputTypeInteger("Enter the ID: ") : (choice.equals("2") ? inputUtil.inputTypeString("Enter the book name: ") : null);
+        if (bookInformation == null) throw new GeneralExceptions(Exceptions.INVALID_OPTION);
+        String type = bookInformation.getClass().getSimpleName();
+
+        switch (type) {
+            case "String":
+                String bookName = (String) bookInformation;
+                books = BookServiceHelper.deleteBookByName(books,bookName,booksCount);
+                break;
+
+            case "Integer":
+                int bookID = (int) bookInformation;
+                if (bookID <= 0 || bookID > bookIdCounter) throw new GeneralExceptions(Exceptions.ID_CANNOT_BE_ZERO);
+                books = BookServiceHelper.deleteBookById(books,bookID,booksCount);
+                break;
+        }
+
+        booksCount--;
+        bookIdCounter--;
+        System.out.println("\n---------------| The book has successfully been deleted! |---------------");
+
 
     }
 
