@@ -61,7 +61,7 @@ public class ManagementHelper {
 
                     User currentUser = userService.getCurrentUser();
 
-                    if (currentUser != null && currentUser.getRole() == Role.ADMIN){
+                    if (currentUser != null && currentUser.getRole() == Role.ADMIN) {
                         System.out.println("Welcome, Admin: " + currentUser.getName());
                         adminMenu(userService);
                     } else {
@@ -163,7 +163,6 @@ public class ManagementHelper {
     }
 
 
-
     public static void userMenu(UserService userService) {
         while (true) {
             byte userOption = MenuUtil.userMenu();
@@ -172,7 +171,7 @@ public class ManagementHelper {
                 case 0 -> {
                     return;
                 }
-                case 1 ->{
+                case 1 -> {
 
                     User currentUser = userService.getCurrentUser();
 
@@ -259,8 +258,14 @@ public class ManagementHelper {
                 case 0 -> {
                     return;
                 }
-                case 1 -> System.out.println("borrow Service daxilinde her hansisa method");
-                case 2 -> System.out.println("borrow Service daxilinde her hansisa 2ci method");
+                case 1 -> borrowService.borrowBook();
+                case 2 -> borrowService.returnBook();
+                case 3 -> borrowService.showBorrows();
+                case 4 -> borrowService.getOverdueBorrowRecords();
+                case 5 -> borrowService.getOverdueFee();
+                case 6 -> borrowService.getTotalCost();
+                case 7 -> borrowService.updateBorrowRecord();
+                case 8 -> borrowService.deleteBorrowRecord();
                 default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
             }
         }

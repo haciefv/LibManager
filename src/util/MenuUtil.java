@@ -107,7 +107,14 @@ public class MenuUtil {
                         ----------| Borrow Management |----------
                         
                         [0] -> Back to Main Menu
-                        [1] -> (add borrow methods)
+                        [1] -> Borrow Book
+                        [2] -> Return Book
+                        [3] -> Show All Books
+                        [4] -> Show Overdue Books
+                        [5] -> Show Overdue Fee
+                        [6] -> Show Total Cost
+                        [7] -> Update Borrow Record
+                        [8] -> Delete Borrow Record
                         """
         );
         return InputUtil.getInstance().inputTypeByte("Choose the option: ");

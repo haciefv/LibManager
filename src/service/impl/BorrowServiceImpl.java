@@ -2,10 +2,9 @@ package service.impl;
 
 import enums.Exceptions;
 import exceptions.GeneralExceptions;
-import helper.BookServiceHelper;
 import helper.BorrowServiceHelper;
-import model.Borrow;
 import service.BorrowService;
+import model.Borrow;
 import util.InputUtil;
 
 import java.time.LocalDate;
@@ -13,6 +12,7 @@ import java.time.Period;
 import java.util.Arrays;
 
 public class BorrowServiceImpl implements BorrowService {
+    InputUtil inputUtil = InputUtil.getInstance();
     private Borrow[] borrowRecords;
     private int borrowCount;
     private int overDueBookCount;
@@ -25,23 +25,30 @@ public class BorrowServiceImpl implements BorrowService {
     }
 
     @Override
-    public void borrowBook(Long userId, Long bookId, LocalDate dueDate) {
+    public void borrowBook() {
         if (borrowCount == borrowRecords.length) {
             borrowRecords = Arrays.copyOf(borrowRecords, borrowRecords.length * 2);
         }
+        Long userId = inputUtil.inputTypeLong("Enter the user id: ");
+        Long bookId = inputUtil.inputTypeLong("Enter the book id: ");
+        LocalDate dueDate = BorrowServiceHelper.dueTimeIdentify();
         Borrow newBorrow = new Borrow();
         newBorrow.setRecordID(borrowIdCounter++);
         newBorrow.setUserID(userId);
         newBorrow.setBookID(bookId);
         newBorrow.setDueDate(dueDate);
-        newBorrow.setCost(1.42); //for check
+        newBorrow.setCost(BorrowServiceHelper.findCost(dueDate));
         newBorrow.setBorrowDate(LocalDate.now());
         newBorrow.setReturned(false);
         borrowRecords[borrowCount++] = newBorrow;
+        borrowIdCounter++;
+        System.out.println("Borrow record has been added successfully.");
     }
 
     @Override
-    public void returnBook(Long borrowRecordId, LocalDate returnDate) {
+    public void returnBook() {
+        Long borrowRecordId = inputUtil.inputTypeLong("Enter the record id: ");
+        LocalDate returnDate = LocalDate.now();
         Borrow currentBorrow = BorrowServiceHelper.findBorrowRecordById(borrowRecords, borrowCount, borrowRecordId);
         if (currentBorrow == null) {
             throw new GeneralExceptions(Exceptions.Record_NOT_FOUND);
@@ -53,73 +60,82 @@ public class BorrowServiceImpl implements BorrowService {
                 break;
             }
         }
-
+        currentBorrow.setCost(BorrowServiceHelper.findCost(LocalDate.now())); //cost when the book is returned
+        System.out.println("The book has been returned.");
     }
 
     @Override
     public void showBorrows() {
-        for (int i = 0; i < borrowCount; i++) {
-            System.out.println(borrowRecords[i]);
-        }
+        if (borrowCount == 0) throw new GeneralExceptions(Exceptions.Record_NOT_FOUND);
+        BorrowServiceHelper.show(borrowRecords, borrowCount);
     }
 
     @Override
-    public boolean isOverdue(Borrow b) {
-        return LocalDate.now().isAfter(b.getDueDate());
-    }
-
-    @Override
-    public Borrow[] getOverdueBorrowRecords() {
+    public void getOverdueBorrowRecords() {
+        if (borrowCount == 0) throw new GeneralExceptions(Exceptions.Record_NOT_FOUND);
         Borrow[] overdueRecords = new Borrow[borrowCount];
-        for (Borrow b : borrowRecords) {
-            if (isOverdue(b)) {
-                overdueRecords[overDueBookCount++] = b;
+        for (int i = 0; i < borrowCount; i++) {
+            if (BorrowServiceHelper.isOverdue(borrowRecords[i])) {
+                overdueRecords[overDueBookCount++] = borrowRecords[i];
             }
         }
         if (overDueBookCount == 0) throw new GeneralExceptions(Exceptions.OverdueBorrowRecord_NOT_FOUND);
-        return overdueRecords;
+        BorrowServiceHelper.show(overdueRecords, overDueBookCount);
     }
 
     @Override
-    public double getOverdueFee(Long borrowRecordId, double dailyPenalty) {
+    public void getOverdueFee() {
+        Long borrowRecordId = inputUtil.inputTypeLong("Enter the record id to view overdue fee: ");
+        double dailyPenalty = 0.5;
         Borrow currentBorrow = BorrowServiceHelper.findBorrowRecordById(borrowRecords, borrowCount, borrowRecordId);
         if (currentBorrow == null) {
             throw new GeneralExceptions(Exceptions.Record_NOT_FOUND);
         }
-        if (isOverdue(currentBorrow)) {
+        double overdueFee = 0;
+        if (BorrowServiceHelper.isOverdue(currentBorrow)) {
             long overdueDays = Period.between(currentBorrow.getDueDate(), LocalDate.now()).getDays();
-            double overdueFee = overdueDays * dailyPenalty;
+            overdueFee = overdueDays * dailyPenalty;
             currentBorrow.setCost(overdueFee + currentBorrow.getCost());
             // Update the borrow record cost
             currentBorrow.setCost(overdueFee + currentBorrow.getCost());
-            return overdueFee;
         }
-        return 0; // no overdue fee
+        System.out.println("Overdue fee: " + overdueFee);
     }
 
     @Override
-    public double getTotalCost() {
+    public void getTotalCost() {
         double totalCost = 0;
         for (int i = 0; i < borrowCount; i++) {
             totalCost += borrowRecords[i].getCost();
         }
-        return totalCost;
+        System.out.println("Total cost: " + totalCost);
     }
 
     @Override
-    public void updateBorrowRecord(Long borrowRecordId, boolean isReturned) {
+    public void updateBorrowRecord() {
         if (borrowCount == 0) {
             throw new GeneralExceptions(Exceptions.NO_RECORDS_TO_DELETE);
         }
+        Long borrowRecordId = inputUtil.inputTypeLong("Enter the record id: ");
         Borrow currentRecord = BorrowServiceHelper.findBorrowRecordById(borrowRecords, borrowCount, borrowRecordId);
         if (currentRecord == null) {
             throw new GeneralExceptions(Exceptions.Record_NOT_FOUND);
         }
-        currentRecord.setReturned(isReturned);
+        byte choice = inputUtil.inputTypeByte("""
+                What do you want to update?
+                 [1] -> Due date
+                """); // else....
+        switch (choice) {
+            case 1 -> BorrowServiceHelper.dueTimeExtend(currentRecord);
+            default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
+        }
+        System.out.println("Borrow record has been updated successfully.");
+
     }
 
     @Override
-    public void deleteBorrowRecord(Long borrowRecordId) {
+    public void deleteBorrowRecord() {
+        Long borrowRecordId = inputUtil.inputTypeLong("Enter the record id to delete: ");
         // Not sure
         if (borrowCount == 0) {
             throw new GeneralExceptions(Exceptions.NO_RECORDS_TO_DELETE);
@@ -127,5 +143,7 @@ public class BorrowServiceImpl implements BorrowService {
         int deleteBorrowIndex = BorrowServiceHelper.getIndexOfBorrow(borrowRecords, borrowCount, borrowRecordId);
         borrowRecords = BorrowServiceHelper.delete(borrowRecords, borrowCount, deleteBorrowIndex);
         borrowCount--;
+        borrowIdCounter--;
+        System.out.println("The borrow record has been deleted successfully.");
     }
 }
