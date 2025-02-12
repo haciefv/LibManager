@@ -23,10 +23,10 @@ public class UserServiceImpl implements UserService {
 
     public UserServiceImpl() {
         User admin = new User();
-        admin.setName("Admin");
-        admin.setSurname("Admin");
-        admin.setUsername("Admin");
-        admin.setPassword("Admin");
+        admin.setName("admin");
+        admin.setSurname("admin");
+        admin.setUsername("admin");
+        admin.setPassword("admin");
         admin.setRole(Role.ADMIN);
         admin.setId(userIdCounter++);
         admin.setActive(true);
@@ -197,8 +197,14 @@ public class UserServiceImpl implements UserService {
 
     }
 
-//    TODO Burada her hansisa islemnen evvle Userin login olmaqini yoxlamaq lazimdi
-//     eger login olmayibsa ve ya register olmayibsa bir xeta atmaq lazimdi
-//     login ve ya register ol bu islemi istifade eleye bilmek ucun kimisinden
+//    --------------------------------------------------------------------------
+
+//    FIXME: current user uzerinde duzelisler
+
+//    --------------------------------------------------------------------------
+
+//    TODO: burada userin staus ve blokedlerine baxmaq lazimdi eger uzer block olunubsa artiq girisine icaze olmayacaq mueyyen bir muddetlik (sebeb kodun 5 defe ardicil olaraq yalnis daxil olunmasi)
+//    TODO: user oz melumatlarini silerken ve ya admin her hansisa uzeri silerkken onun statusunu deyismek bir basa silmemek
+//    TODO: status deyisdikden sonra umumi siyahida hemin userin gorsenmemeyi
 
 }
