@@ -11,233 +11,70 @@ import service.impl.BookServiceImpl;
 import util.InputUtil;
 import util.MenuUtil;
 
-import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class ManagementHelper {
 
+//    Admin and User Management
+
     public static void loginOrRegistrationAsUser(UserService userService) {
-        while (true) {
-            byte userOption = MenuUtil.loginOrRegisterAsUserMenu();
-
-            switch (userOption) {
-                case 0 -> {
-                    return;
-                }
-                case 1 -> userService.registerAsUser();
-                case 2 -> {
-
-                    String username = InputUtil.getInstance().inputTypeString("Enter username: ");
-                    String password = InputUtil.getInstance().inputTypeString("Enter password: ");
-
-                    userService.login(username, password);
-
-                    User currentUser = userService.getCurrentUser();
-                    if (currentUser != null && currentUser.getRole() == Role.USER) {
-                        System.out.println("Welcome: " + currentUser.getName());
-                        userMenu(userService);
-                    } else {
-                        throw new GeneralExceptions(Exceptions.USER_NOT_FOUND);
-                    }
-                }
-
-
-                default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
-            }
-        }
+        Map<Byte, Runnable> actionMap = Map.of(
+                (byte) 0, () -> {
+                },
+                (byte) 1, userService::registerAsUser,
+                (byte) 2, () -> loginForUser(userService)
+        );
+        handleMenu(MenuUtil::loginOrRegisterAsUserMenu, actionMap);
     }
 
     public static void loginAsAdmin(UserService userService) {
-        while (true) {
-            byte userOption = MenuUtil.loginAsAdmin();
-            switch (userOption) {
-                case 0 -> {
-                    return;
-                }
-                case 1 -> {
-
-                    String username = InputUtil.getInstance().inputTypeString("Enter username: ");
-                    String password = InputUtil.getInstance().inputTypeString("Enter password: ");
-
-                    userService.login(username, password);
-
-                    User currentUser = userService.getCurrentUser();
-
-                    if (currentUser != null && currentUser.getRole() == Role.ADMIN) {
-                        System.out.println("Welcome, Admin: " + currentUser.getName());
-                        adminMenu(userService);
-                    } else {
-                        System.out.println("You are not authorized as an admin.");
-                    }
-                }
-                default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
-            }
-        }
+        Map<Byte, Runnable> actionMap = Map.of(
+                (byte) 0, () -> {},
+                (byte) 1, () -> loginForAdmin(userService)
+        );
+        handleMenu(MenuUtil::loginAsAdmin, actionMap);
     }
 
     public static void adminMenu(UserService userService) {
-        while (true) {
-            byte userOption = MenuUtil.adminMenu();
-            switch (userOption) {
-                case 0 -> {
-                    return;
-                }
-                case 1 -> {
-                    Long userId = InputUtil.getInstance().inputTypeLong("Enter user ID to update: ");
-
-                    System.out.println("Select the fields to update (Enter numbers separated by commas):");
-                    System.out.println("1. Name");
-                    System.out.println("2. Surname");
-                    System.out.println("3. Password");
-                    System.out.println("4. Birthday");
-                    System.out.println("5. Gmail");
-                    System.out.println("6. Phone Number");
-                    System.out.println("7. is Active");
-                    System.out.println("8. isBlocked");
-                    System.out.println("9. Role");
-                    System.out.print("Enter the numbers of fields to update (e.g., 1,3): ");
-
-                    String selectedFields = InputUtil.getInstance().inputTypeString("");
-                    String[] selectedFieldsArray = selectedFields.split(",");
-
-                    User user = userService.getUserById(userId);
-
-                    for (String field : selectedFieldsArray) {
-                        switch (field.trim()) {
-                            case "1":
-                                String updatedName = InputUtil.getInstance().inputTypeString("Enter new name: ");
-                                user.setName(updatedName);
-                                break;
-                            case "2":
-                                String surname = InputUtil.getInstance().inputTypeString("Enter new surname: ");
-                                user.setSurname(surname);
-                                break;
-                            case "3":
-                                String password = InputUtil.getInstance().inputTypeString("Enter new password: ");
-                                user.setPassword(password);
-                                break;
-                            case "4":
-                                LocalDate birthdate = InputUtil.getInstance().inputTypeLocalDate("Enter new birth date(yyyy-MM-dd): ");
-                                user.setBirthDate(birthdate);
-                                break;
-                            case "5":
-                                String gmail = InputUtil.getInstance().inputTypeString("Enter new gmail: ");
-                                user.setGmail(gmail);
-                                break;
-                            case "6":
-                                String updatedPhone = InputUtil.getInstance().inputTypeString("Enter new phone: ");
-                                user.setPhoneNumber(updatedPhone);
-                                break;
-                            case "7":
-                                Boolean active = InputUtil.getInstance().inputTypeBoolean("Enter new active status: ");
-                                user.setActive(active);
-                                break;
-                            case "8":
-                                Boolean blocked = InputUtil.getInstance().inputTypeBoolean("Enter new Blocked status: ");
-                                user.setBlocked(blocked);
-                                break;
-                            case "9":
-                                Role role = InputUtil.getInstance().inputTypeRole("Enter new role: ");
-                                user.setRole(role);
-                                break;
-                            default:
-                                System.out.println("Invalid option selected.");
-                                break;
-                        }
-                    }
-
-                    userService.updateUser(userId, user);
-                }
-
-                case 2 -> {
-                    Long userId = InputUtil.getInstance().inputTypeLong("Enter user ID to delete: ");
-
-                    User user = userService.getUserById(userId);
-                    userService.deleteByAdmin(user.getId());
-                }
-
-                case 3 -> userService.showUsers();
-                case 4 -> userService.showUserProfile();
-                case 5 ->  manageBooks(new BookServiceImpl());
-                case 6 -> userService.logout();
-                default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
-            }
-        }
+        Map<Byte, Runnable> actionMap = Map.of(
+                (byte) 0, () -> {},
+                (byte) 1, () -> updateUserAsAdmin(userService),
+                (byte) 2, () -> deleteUserAsAdmin(userService),
+                (byte) 3, userService::showUsers,
+                (byte) 4, userService::showUserProfile,
+                (byte) 5, () -> manageBooks(new BookServiceImpl()),
+                (byte) 6, userService::logout
+        );
+        handleMenu(MenuUtil::adminMenu, actionMap);
     }
-
 
     public static void userMenu(UserService userService) {
+        Map<Byte, Runnable> actionMap = Map.of(
+                (byte) 0, () -> {},
+                (byte) 1, () -> updateUserAsUser(userService),
+                (byte) 2, userService::deleteProfile,
+                (byte) 3, userService::showUserProfile,
+                (byte) 4, userService::logout
+        );
+        handleMenu(MenuUtil::userMenu, actionMap);
+    }
+
+    public static void handleMenu(Supplier<Byte> menuSupplier, Map<Byte, Runnable> actionMap) {
         while (true) {
-            byte userOption = MenuUtil.userMenu();
+            byte userOption = menuSupplier.get();
+            Runnable action = actionMap.get(userOption);
 
-            switch (userOption) {
-                case 0 -> {
-                    return;
-                }
-                case 1 -> {
-
-                    User currentUser = userService.getCurrentUser();
-
-                    System.out.println("Select the fields to update (Enter numbers separated by commas):");
-                    System.out.println("1. Name");
-                    System.out.println("2. Surname");
-                    System.out.println("3. Username");
-                    System.out.println("4. Password");
-                    System.out.println("5. Birthday");
-                    System.out.println("6. Gmail");
-                    System.out.println("7. Phone Number");
-                    System.out.print("Enter the numbers of fields to update (e.g., 1,3): ");
-
-                    String selectedFields = InputUtil.getInstance().inputTypeString("");
-                    String[] selectedFieldsArray = selectedFields.split(",");
-
-                    User user = userService.getUserById(currentUser.getId());
-
-                    for (String field : selectedFieldsArray) {
-                        switch (field.trim()) {
-                            case "1":
-                                String updatedName = InputUtil.getInstance().inputTypeString("Enter new name: ");
-                                user.setName(updatedName);
-                                break;
-                            case "2":
-                                String surname = InputUtil.getInstance().inputTypeString("Enter new surname: ");
-                                user.setSurname(surname);
-                                break;
-                            case "3":
-                                String username = InputUtil.getInstance().inputTypeString("Enter new username: ");
-                                user.setPassword(username);
-                                break;
-                            case "4":
-                                String password = InputUtil.getInstance().inputTypeString("Enter new password: ");
-                                user.setPassword(password);
-                                break;
-                            case "5":
-                                LocalDate birthdate = InputUtil.getInstance().inputTypeLocalDate("Enter new birth date(yyyy-MM-dd): ");
-                                user.setBirthDate(birthdate);
-                                break;
-                            case "6":
-                                String gmail = InputUtil.getInstance().inputTypeString("Enter new gmail: ");
-                                user.setGmail(gmail);
-                                break;
-                            case "7":
-                                String updatedPhone = InputUtil.getInstance().inputTypeString("Enter new phone: ");
-                                user.setPhoneNumber(updatedPhone);
-                                break;
-                            default:
-                                System.out.println("Invalid option selected.");
-                                break;
-                        }
-                    }
-
-                    userService.updateUser(currentUser.getId(), user);
-                }
-
-                case 2 -> userService.deleteProfile();
-                case 3 -> userService.showUserProfile();
-                case 4 -> userService.logout();
-                default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
+            if (action != null) {
+                action.run();
+            } else {
+                throw new GeneralExceptions(Exceptions.INVALID_OPTION);
             }
         }
     }
+
+//    Book Management
 
     public static void manageBooks(BookService bookService) {
         while (true) {
@@ -249,11 +86,13 @@ public class ManagementHelper {
                 case 1 -> bookService.addBook();
                 case 2 -> bookService.updateBook();
                 case 3 -> bookService.deleteBook();
-                case 4 ->bookService.showAllBooks();
+                case 4 -> bookService.showAllBooks();
                 default -> throw new GeneralExceptions(Exceptions.INVALID_OPTION);
             }
         }
     }
+
+//    Borrowing Management
 
     public static void manageBorrowing(BorrowService borrowService) {
         while (true) {
@@ -275,6 +114,8 @@ public class ManagementHelper {
         }
     }
 
+//    Common Management
+
     public static void manageCommon() {
         while (true) {
             byte commonOption = MenuUtil.commonMenu();
@@ -288,4 +129,141 @@ public class ManagementHelper {
             }
         }
     }
+
+//    Extracted Methods
+
+    private static void loginForAdmin(UserService userService) {
+        String username = InputUtil.getInstance().inputTypeString("Enter username: ");
+        String password = InputUtil.getInstance().inputTypeString("Enter password: ");
+
+        userService.login(username, password);
+
+        User currentUser = userService.getCurrentUser();
+
+        if (currentUser != null && currentUser.getRole() == Role.ADMIN) {
+            System.out.println("Welcome, Admin: " + currentUser.getName());
+            adminMenu(userService);
+        } else {
+            System.out.println("You are not authorized as an admin.");
+        }
+    }
+
+    private static void loginForUser(UserService userService) {
+        String username = InputUtil.getInstance().inputTypeString("Enter username: ");
+        String password = InputUtil.getInstance().inputTypeString("Enter password: ");
+
+        userService.login(username, password);
+
+        User currentUser = userService.getCurrentUser();
+        if (currentUser != null && currentUser.getRole() == Role.USER) {
+            System.out.println("Welcome: " + currentUser.getName());
+            userMenu(userService);
+        } else {
+            throw new GeneralExceptions(Exceptions.USER_NOT_FOUND);
+        }
+    }
+
+    private static void deleteUserAsAdmin(UserService userService) {
+        Long userId = InputUtil.getInstance().inputTypeLong("Enter user ID to delete: ");
+        User user = userService.getUserById(userId);
+        userService.deleteByAdmin(user.getId());
+    }
+
+    private static void updateUserAsAdmin(UserService userService) {
+        Long userId = InputUtil.getInstance().inputTypeLong("Enter user ID to update: ");
+
+        System.out.println("""
+                Select the fields to update (Enter numbers separated by commas):
+                1. Name
+                2. Surname
+                3. Password
+                4. Birthday
+                5. Gmail
+                6. Phone Number
+                7. is Active
+                8. isBlocked
+                9. Role
+                Enter the numbers of fields to update (e.g., 1,3):\s""");
+
+
+        String selectedFields = InputUtil.getInstance().inputTypeString("");
+        String[] selectedFieldsArray = selectedFields.split(",");
+
+        User user = userService.getUserById(userId);
+
+        Map<String, Runnable> updateActions = getStringRunnableMapForAdmin(user);
+
+        for (String field : selectedFieldsArray) {
+            Runnable action = updateActions.get(field.trim());
+            if (action != null) {
+                action.run();
+            } else {
+                System.out.println("Invalid option selected.");
+            }
+        }
+        userService.updateUser(userId, user);
+    }
+
+    private static Map<String, Runnable> getStringRunnableMapForAdmin(User user) {
+        Map<String, Runnable> updateActions = new LinkedHashMap<>();
+
+        updateActions.put("1", () -> user.setName(InputUtil.getInstance().inputTypeString("Enter new name: ")));
+        updateActions.put("2", () -> user.setSurname(InputUtil.getInstance().inputTypeString("Enter new surname: ")));
+        updateActions.put("3", () -> user.setPassword(InputUtil.getInstance().inputTypeString("Enter new password: ")));
+        updateActions.put("4", () -> user.setBirthDate(InputUtil.getInstance().inputTypeLocalDate("Enter new birth date (yyyy-MM-dd): ")));
+        updateActions.put("5", () -> user.setGmail(InputUtil.getInstance().inputTypeString("Enter new Gmail: ")));
+        updateActions.put("6", () -> user.setPhoneNumber(InputUtil.getInstance().inputTypeString("Enter new phone: ")));
+        updateActions.put("7", () -> user.setActive(InputUtil.getInstance().inputTypeBoolean("Enter new active status: ")));
+        updateActions.put("8", () -> user.setBlocked(InputUtil.getInstance().inputTypeBoolean("Enter new Blocked status: ")));
+        updateActions.put("9", () -> user.setRole(InputUtil.getInstance().inputTypeRole("Enter new role: ")));
+        return updateActions;
+    }
+
+    private static void updateUserAsUser(UserService userService) {
+        User currentUser = userService.getCurrentUser();
+
+        System.out.println("""
+                Select the fields to update (Enter numbers separated by commas):
+                1. Name
+                2. Surname
+                3. Username
+                4. Password
+                5. Birthday
+                6. Gmail
+                7. Phone Number
+                Enter the numbers of fields to update (e.g., 1,3):\s""");
+
+        String selectedFields = InputUtil.getInstance().inputTypeString("");
+        String[] selectedFieldsArray = selectedFields.split(",");
+
+        User user = userService.getUserById(currentUser.getId());
+
+        Map<String, Runnable> updateActions = getStringRunnableMapForUser(user);
+
+        for (String field : selectedFieldsArray) {
+            Runnable action = updateActions.get(field.trim());
+            if (action != null) {
+                action.run();
+            } else {
+                System.out.println("Invalid option selected.");
+            }
+        }
+
+        userService.updateUser(currentUser.getId(), user);
+
+    }
+
+    private static Map<String, Runnable> getStringRunnableMapForUser(User user) {
+        Map<String, Runnable> updateActions = new LinkedHashMap<>();
+
+        updateActions.put("1", () -> user.setName(InputUtil.getInstance().inputTypeString("Enter new name: ")));
+        updateActions.put("2", () -> user.setSurname(InputUtil.getInstance().inputTypeString("Enter new surname: ")));
+        updateActions.put("3", () -> user.setUsername(InputUtil.getInstance().inputTypeString("Enter new username: ")));
+        updateActions.put("4", () -> user.setPassword(InputUtil.getInstance().inputTypeString("Enter new password: ")));
+        updateActions.put("5", () -> user.setBirthDate(InputUtil.getInstance().inputTypeLocalDate("Enter new birth date (yyyy-MM-dd): ")));
+        updateActions.put("6", () -> user.setGmail(InputUtil.getInstance().inputTypeString("Enter new Gmail: ")));
+        updateActions.put("7", () -> user.setPhoneNumber(InputUtil.getInstance().inputTypeString("Enter new phone: ")));
+        return updateActions;
+    }
+
 }
