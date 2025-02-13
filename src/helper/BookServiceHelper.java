@@ -1,9 +1,9 @@
 package helper;
 
-import enums.Exceptions;
-import enums.Genres;
-import exceptions.GeneralExceptions;
-import model.Book;
+import domain.core.exceptions.Exceptions;
+import domain.core.model.enums.Genres;
+import domain.core.exceptions.GeneralExceptions;
+import domain.core.model.Book;
 import service.impl.BookServiceImpl;
 import util.InputUtil;
 

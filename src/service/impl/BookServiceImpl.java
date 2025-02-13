@@ -1,18 +1,15 @@
 package service.impl;
 
-import enums.Exceptions;
-import enums.Genres;
-import exceptions.GeneralExceptions;
+import domain.core.exceptions.Exceptions;
+import domain.core.exceptions.GeneralExceptions;
 import helper.BookServiceHelper;
-import helper.UserServiceHelper;
-import model.Book;
-import model.User;
+import domain.core.model.Book;
+import domain.core.model.User;
 import service.BookService;
 import util.InputUtil;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import enums.Genres.BookGenre;
+import domain.core.model.enums.Genres.BookGenre;
 
 public class BookServiceImpl implements BookService {
     private static final InputUtil inputUtil = InputUtil.getInstance();

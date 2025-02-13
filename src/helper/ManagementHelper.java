@@ -1,9 +1,9 @@
 package helper;
 
-import enums.Exceptions;
-import enums.Role;
-import exceptions.GeneralExceptions;
-import model.User;
+import domain.core.exceptions.Exceptions;
+import domain.core.model.enums.Role;
+import domain.core.exceptions.GeneralExceptions;
+import domain.core.model.User;
 import service.BookService;
 import service.BorrowService;
 import service.UserService;

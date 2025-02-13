@@ -1,6 +1,6 @@
 package service;
 
-import model.Book;
+import domain.core.model.Book;
 
 import java.util.List;
 

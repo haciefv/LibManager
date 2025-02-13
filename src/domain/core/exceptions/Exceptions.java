@@ -1,4 +1,4 @@
-package enums;
+package domain.core.exceptions;
 
 import java.time.LocalDateTime;
 

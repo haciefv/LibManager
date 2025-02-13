@@ -1,6 +1,4 @@
-package exceptions;
-
-import enums.Exceptions;
+package domain.core.exceptions;
 
 public class GeneralExceptions extends RuntimeException{
 

@@ -1,10 +1,10 @@
 package service.impl;
 
-import enums.Exceptions;
-import exceptions.GeneralExceptions;
+import domain.core.exceptions.Exceptions;
+import domain.core.exceptions.GeneralExceptions;
 import helper.BorrowServiceHelper;
 import service.BorrowService;
-import model.Borrow;
+import domain.core.model.Borrow;
 import util.InputUtil;
 
 import java.time.LocalDate;

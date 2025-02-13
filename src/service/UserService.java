@@ -1,6 +1,6 @@
 package service;
 
-import model.User;
+import domain.core.model.User;
 
 public interface UserService {
 

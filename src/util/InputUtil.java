@@ -1,6 +1,6 @@
 package util;
 
-import enums.Role;
+import domain.core.model.enums.Role;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

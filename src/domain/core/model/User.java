@@ -1,8 +1,8 @@
-package model;
+package domain.core.model;
 
-import enums.Exceptions;
-import enums.Role;
-import exceptions.GeneralExceptions;
+import domain.core.exceptions.Exceptions;
+import domain.core.model.enums.Role;
+import domain.core.exceptions.GeneralExceptions;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

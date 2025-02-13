@@ -1,10 +1,10 @@
 package service.impl;
 
-import enums.Exceptions;
-import enums.Role;
-import exceptions.GeneralExceptions;
+import domain.core.exceptions.Exceptions;
+import domain.core.model.enums.Role;
+import domain.core.exceptions.GeneralExceptions;
 import helper.UserServiceHelper;
-import model.User;
+import domain.core.model.User;
 import service.UserService;
 import util.InputUtil;
 

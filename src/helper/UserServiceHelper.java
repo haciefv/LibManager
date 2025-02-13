@@ -1,9 +1,9 @@
 package helper;
 
-import enums.Exceptions;
-import exceptions.GeneralExceptions;
-import model.User;
-import enums.Role;
+import domain.core.exceptions.Exceptions;
+import domain.core.exceptions.GeneralExceptions;
+import domain.core.model.User;
+import domain.core.model.enums.Role;
 
 public class UserServiceHelper {
 

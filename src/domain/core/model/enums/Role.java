@@ -1,4 +1,4 @@
-package enums;
+package domain.core.model.enums;
 
 public enum Role {
 

@@ -1,4 +1,4 @@
-package enums;
+package domain.core.model.enums;
 
 public class Genres {
     public enum BookGenre {

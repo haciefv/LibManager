@@ -1,7 +1,7 @@
-package model;
+package domain.core.model;
 
 import java.time.LocalDateTime;
-import enums.Genres.BookGenre;
+import domain.core.model.enums.Genres.BookGenre;
 
 
 public class Book {
