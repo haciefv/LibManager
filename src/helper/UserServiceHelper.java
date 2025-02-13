@@ -50,13 +50,12 @@ public class UserServiceHelper {
     public static void deleteUser(User[] users, int userCount, Long id) {
         for (int i = 0; i < userCount; i++) {
             if (users[i] != null && users[i].getId().equals(id)) {
-                for (int j = i; j < userCount - 1; j++) {
-                    users[j] = users[j + 1];
-                }
-                users[--userCount] = null;
+                users[i].setActive(false);
+                users[i].setBlocked(true);
                 return;
             }
         }
         throw new GeneralExceptions(Exceptions.USER_NOT_FOUND);
     }
+
 }
